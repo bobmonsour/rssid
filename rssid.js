@@ -3,6 +3,7 @@
 import fs from "fs";
 import path from "path";
 import yaml from "js-yaml";
+import crypto from "crypto";
 
 // Get the current directory
 const currentDirectory = process.cwd();
@@ -14,8 +15,9 @@ Usage: add-rssid [options]
 
 Options:
   -h            Display this help message
-  -add, -a      Add the rssid to the front matter of all files listed in filelist.txt
-  -remove, -r   Remove the rssid from the front matter of all files listed in filelist.txt
+  -add, -a      Add the rssid to the front matter of all files in the directory
+  -remove, -r   Remove the rssid from the front matter of all files in the directory
+  -e=<ext>      Process only files with the specified extension (default: .md)
   -f=filename   Process only the specified file (assumes .md extension if not provided)
 `);
 }
@@ -40,13 +42,27 @@ if (!addOption && !removeOption) {
 	process.exit(1);
 }
 
+// Check for the -e=<ext> option
+const extOption = process.argv.find((arg) => arg.startsWith("-e="));
+let specifiedExtension = extOption ? extOption.split("=")[1] : "md";
+
+// Ensure the extension starts with a dot
+if (!specifiedExtension.startsWith(".")) {
+	specifiedExtension = `.${specifiedExtension}`;
+}
+
 // Check for the -f=filename option
 const fileOption = process.argv.find((arg) => arg.startsWith("-f="));
-const specifiedFilename = fileOption ? fileOption.split("=")[1] : null;
+let specifiedFilename = fileOption ? fileOption.split("=")[1] : null;
 
 // If specifiedFilename does not have an extension, assume .md
 if (specifiedFilename && !path.extname(specifiedFilename)) {
 	specifiedFilename += ".md";
+}
+
+// Function to generate MD5 hash of a string
+function generateMD5Hash(str) {
+	return crypto.createHash("md5").update(str).digest("hex");
 }
 
 // Function to process a single file
@@ -69,14 +85,20 @@ function processFile(filename, lineNumber = null) {
 
 	// Add or remove rssid based on the option
 	if (addOption) {
-		// Add rssid logic here
+		// Generate MD5 hash of the base part of the filename (excluding the extension)
+		const baseName = path.basename(filename, path.extname(filename));
+		const rssid = generateMD5Hash(baseName);
 		console.log(`Adding rssid to file: ${filename}`);
-		// Your addition logic here
+		frontMatter.rssid = rssid;
 	} else if (removeOption) {
-		// Remove rssid logic here
 		console.log(`Removing rssid from file: ${filename}`);
-		// Your removal logic here
+		delete frontMatter.rssid;
 	}
+
+	// Reconstruct the file content with updated front matter
+	const newFrontMatter = yaml.dump(frontMatter);
+	const newFileContent = `---\n${newFrontMatter}---\n${content}`;
+	fs.writeFileSync(filePath, newFileContent, "utf-8");
 
 	return true; // Return true if processed successfully, false otherwise
 }
@@ -84,26 +106,30 @@ function processFile(filename, lineNumber = null) {
 if (specifiedFilename) {
 	processFile(specifiedFilename);
 } else {
-	// Read the file list
-	const fileListPath = path.join(currentDirectory, "filelist.txt");
-	const fileList = fs
-		.readFileSync(fileListPath, "utf-8")
-		.split("\n")
-		.filter(Boolean);
+	// Read the directory contents
+	fs.readdir(currentDirectory, (err, files) => {
+		if (err) {
+			console.error("Unable to read directory:", err);
+			process.exit(1);
+		}
 
-	// Process each file in the file list
-	let allProcessedSuccessfully = true;
-	fileList.forEach((filename, index) => {
-		const lineNumber = index + 1;
-		const result = processFile(filename, lineNumber);
-		if (!result) {
-			allProcessedSuccessfully = false;
+		// Filter files by the specified extension
+		const filteredFiles = files.filter(
+			(file) => path.extname(file) === specifiedExtension
+		);
+
+		// Process each file with the specified extension
+		let allProcessedSuccessfully = true;
+		filteredFiles.forEach((filename, index) => {
+			const lineNumber = index + 1;
+			const result = processFile(filename, lineNumber);
+			if (!result) {
+				allProcessedSuccessfully = false;
+			}
+		});
+
+		if (allProcessedSuccessfully) {
+			console.log(`Processed all files with extension: ${specifiedExtension}`);
 		}
 	});
-
-	// Delete filelist.txt if all files were processed successfully
-	if (allProcessedSuccessfully) {
-		fs.unlinkSync(fileListPath);
-		console.log(`Deleted file: filelist.txt`);
-	}
 }
