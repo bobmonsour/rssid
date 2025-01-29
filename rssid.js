@@ -20,7 +20,7 @@ other files will still be processed as needed.
 Usage: rssid [options]
 
 Options:
-  -h             Display this help message
+  -h, -help      Display this help message
   -a, -add       Add the rssid item to the front matter
   -r, -remove    Remove the rssid item from the front matter
   -e=<ext>       Process all files with this extension (.md if not specified)
@@ -32,7 +32,7 @@ the -e=<ext> or the -f=<filename> option, all .md files will be processed.
 }
 
 // Check for the -h option
-if (process.argv.includes("-h")) {
+if ((arg) => arg.toLowerCase() === "-help" || arg.toLowerCase() === "-h") {
 	displayHelp();
 	process.exit(0);
 }
@@ -53,9 +53,13 @@ const removeOption = process.argv.some(
 	(arg) => arg.toLowerCase() === "-remove" || arg.toLowerCase() === "-r"
 );
 
-// Ensure either -add, -a, -remove, or -r is present
+// Ensure either -add, -a, -remove, -r, or -h is present
 if (!addOption && !removeOption) {
-	console.error("Error: Either -add, -a, -remove, or -r must be specified.");
+	console.error(
+		"Error: Either -add, -a, -remove, -r, -help, or -h must be specified."
+	);
+	console.error("Here is the output of the -h option:");
+	displayHelp();
 	process.exit(1);
 }
 
@@ -83,7 +87,7 @@ function generateMD5Hash(str) {
 }
 
 // Function to process a single file
-function processFile(filename, lineNumber = null) {
+function processFile(filename) {
 	const filePath = path.join(currentDirectory, filename);
 	const fileContent = fs.readFileSync(filePath, "utf-8");
 
@@ -138,8 +142,7 @@ if (specifiedFilename) {
 		// Process each file with the specified extension
 		let allProcessedSuccessfully = true;
 		filteredFiles.forEach((filename, index) => {
-			const lineNumber = index + 1;
-			const result = processFile(filename, lineNumber);
+			const result = processFile(filename);
 			if (!result) {
 				allProcessedSuccessfully = false;
 			}
