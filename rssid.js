@@ -31,54 +31,52 @@ the -e=<ext> or the -f=<filename> option, all .md files will be processed.
 `);
 }
 
-// Check for the -h option
-if ((arg) => arg.toLowerCase() === "-help" || arg.toLowerCase() === "-h") {
-	displayHelp();
-	process.exit(0);
-}
+// Variables to store options
+let addOption = false;
+let removeOption = false;
+let specifiedExtension = ".md";
+let specifiedFilename = null;
 
-// Check for invalid options (not preceded by a -)
+// Process command line arguments using a switch statement
 process.argv.slice(2).forEach((arg) => {
-	if (!arg.startsWith("-")) {
-		console.error(`Error: Invalid option '${arg}'`);
-		process.exit(1);
+	switch (true) {
+		case arg.toLowerCase() === "-h" || arg.toLowerCase() === "-help":
+			displayHelp();
+			process.exit(0);
+			break;
+		case arg.toLowerCase() === "-a" || arg.toLowerCase() === "-add":
+			addOption = true;
+			break;
+		case arg.toLowerCase() === "-r" || arg.toLowerCase() === "-remove":
+			removeOption = true;
+			break;
+		case arg.startsWith("-e="):
+			specifiedExtension = arg.split("=")[1];
+			if (!specifiedExtension.startsWith(".")) {
+				specifiedExtension = `.${specifiedExtension}`;
+			}
+			break;
+		case arg.startsWith("-f="):
+			specifiedFilename = arg.split("=")[1];
+			if (!path.extname(specifiedFilename)) {
+				specifiedFilename += ".md";
+			}
+			break;
+		default:
+			if (!arg.startsWith("-")) {
+				console.error(`Error: Invalid option '${arg}'`);
+				process.exit(1);
+			}
+			break;
 	}
 });
 
-// Check for the -add, -a, -remove, or -r option (case-insensitive)
-const addOption = process.argv.some(
-	(arg) => arg.toLowerCase() === "-add" || arg.toLowerCase() === "-a"
-);
-const removeOption = process.argv.some(
-	(arg) => arg.toLowerCase() === "-remove" || arg.toLowerCase() === "-r"
-);
-
-// Ensure either -add, -a, -remove, -r, or -h is present
+// Ensure either -add, -a, -remove, or -r is present
 if (!addOption && !removeOption) {
-	console.error(
-		"Error: Either -add, -a, -remove, -r, -help, or -h must be specified."
-	);
-	console.error("Here is the output of the -h option:");
+	console.error("Error: One or more command line options must be specified.");
+	console.log("Here is the -help output to provide guidance.");
 	displayHelp();
 	process.exit(1);
-}
-
-// Check for the -e=<ext> option
-const extOption = process.argv.find((arg) => arg.startsWith("-e="));
-let specifiedExtension = extOption ? extOption.split("=")[1] : "md";
-
-// Ensure the extension starts with a dot
-if (!specifiedExtension.startsWith(".")) {
-	specifiedExtension = `.${specifiedExtension}`;
-}
-
-// Check for the -f=filename option
-const fileOption = process.argv.find((arg) => arg.startsWith("-f="));
-let specifiedFilename = fileOption ? fileOption.split("=")[1] : null;
-
-// If specifiedFilename does not have an extension, assume .md
-if (specifiedFilename && !path.extname(specifiedFilename)) {
-	specifiedFilename += ".md";
 }
 
 // Function to generate MD5 hash of a string
@@ -97,7 +95,7 @@ function processFile(filename) {
 	let content = fileContent;
 
 	if (frontMatterMatch) {
-		frontMatter = yaml.load(frontMatterMatch[1]);
+		frontMatter = yaml.load(frontMatterMatch[1], { schema: yaml.JSON_SCHEMA });
 		content = fileContent.slice(frontMatterMatch[0].length);
 	} else {
 		console.error(`Error: No front matter found in file: ${filename}`);
@@ -117,10 +115,12 @@ function processFile(filename) {
 	}
 
 	// Reconstruct the file content with updated front matter
-	const newFrontMatter = yaml.dump(frontMatter);
+	const newFrontMatter = yaml.dump(frontMatter, {
+		schema: yaml.JSON_SCHEMA,
+		lineWidth: -1,
+	});
 	const newFileContent = `---\n${newFrontMatter}---\n${content}`;
 	fs.writeFileSync(filePath, newFileContent, "utf-8");
-
 	return true; // Return true if processed successfully, false otherwise
 }
 
@@ -138,10 +138,9 @@ if (specifiedFilename) {
 		const filteredFiles = files.filter(
 			(file) => path.extname(file) === specifiedExtension
 		);
-
 		// Process each file with the specified extension
 		let allProcessedSuccessfully = true;
-		filteredFiles.forEach((filename, index) => {
+		filteredFiles.forEach((filename) => {
 			const result = processFile(filename);
 			if (!result) {
 				allProcessedSuccessfully = false;
