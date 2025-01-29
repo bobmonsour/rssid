@@ -11,14 +11,23 @@ const currentDirectory = process.cwd();
 // Function to display help message
 function displayHelp() {
 	console.log(`
-Usage: add-rssid [options]
+This command operates ONLY on files in the current directory. It adds
+or removes a YAML front matter item named "rssid" that is the md5 hash
+of the filename (excluding the extention) for the file(s) processed.
+If the file(s) contain no YAML front matter, an error is noted, yet
+other files will still be processed as needed.
+
+Usage: rssid [options]
 
 Options:
-  -h            Display this help message
-  -add, -a      Add the rssid to the front matter of all files in the directory
-  -remove, -r   Remove the rssid from the front matter of all files in the directory
-  -e=<ext>      Process only files with the specified extension (default: .md)
-  -f=filename   Process only the specified file (assumes .md extension if not provided)
+  -h             Display this help message
+  -a, -add       Add the rssid item to the front matter
+  -r, -remove    Remove the rssid item from the front matter
+  -e=<ext>       Process all files with this extension (.md if not specified)
+  -f=<filename>  Process the specified file (.md extension if not specified)
+
+Either -a or -r (or -add or -remove) MUST be specified. In the absence of
+the -e=<ext> or the -f=<filename> option, all .md files will be processed.
 `);
 }
 
