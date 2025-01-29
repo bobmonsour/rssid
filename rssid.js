@@ -28,6 +28,14 @@ if (process.argv.includes("-h")) {
 	process.exit(0);
 }
 
+// Check for invalid options (not preceded by a -)
+process.argv.slice(2).forEach((arg) => {
+	if (!arg.startsWith("-")) {
+		console.error(`Error: Invalid option '${arg}'`);
+		process.exit(1);
+	}
+});
+
 // Check for the -add, -a, -remove, or -r option (case-insensitive)
 const addOption = process.argv.some(
 	(arg) => arg.toLowerCase() === "-add" || arg.toLowerCase() === "-a"
