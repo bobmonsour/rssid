@@ -20,7 +20,7 @@ Usage: add-rssid [options]
 
 Options:
   -h            Display this help message
-  -remove       Remove the rssid from the front matter of all files listed in filelist.txt
+  -remove, -r   Remove the rssid from the front matter of all files listed in filelist.txt
   -f=filename   Process only the specified file (assumes .md extension if not provided)
 `);
 }
@@ -31,9 +31,9 @@ if (process.argv.includes("-h")) {
 	process.exit(0);
 }
 
-// Check for the -remove option (case-insensitive)
+// Check for the -remove or -r option (case-insensitive)
 const removeOption = process.argv.some(
-	(arg) => arg.toLowerCase() === "-remove"
+	(arg) => arg.toLowerCase() === "-remove" || arg.toLowerCase() === "-r"
 );
 
 // Check for the -f=filename option
