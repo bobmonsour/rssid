@@ -8,15 +8,9 @@ import crypto from "crypto";
 // Get the current directory
 const currentDirectory = process.cwd();
 
-// Function to display help message
+// Display the help message
 function displayHelp() {
 	console.log(`
-This command operates ONLY on files in the current directory. It adds
-or removes a YAML front matter item named "rssid" that is the md5 hash
-of the filename (excluding the extention) for the file(s) processed.
-If the file(s) contain no YAML front matter, an error is noted, yet
-other files will still be processed as needed.
-
 Usage: rssid [options]
 
 Options:
@@ -28,16 +22,21 @@ Options:
 
 Either -a or -r (or -add or -remove) MUST be specified. In the absence of
 the -e=<ext> or the -f=<filename> option, all .md files will be processed.
-`);
+
+This command operates ONLY on files in the current directory. It adds
+or removes a YAML front matter item named "rssid" that is the md5 hash
+of the filename (excluding the extension) for the file(s) processed.
+If the file(s) contain no YAML front matter, an error is noted, yet
+other files will still be processed as needed.`);
 }
 
-// Variables to store options
+// Variables to store command line options
 let addOption = false;
 let removeOption = false;
 let specifiedExtension = ".md";
 let specifiedFilename = null;
 
-// Process command line arguments using a switch statement
+// Process command line options
 process.argv.slice(2).forEach((arg) => {
 	switch (true) {
 		case arg.toLowerCase() === "-h" || arg.toLowerCase() === "-help":
@@ -63,15 +62,14 @@ process.argv.slice(2).forEach((arg) => {
 			}
 			break;
 		default:
-			if (!arg.startsWith("-")) {
-				console.error(`Error: Invalid option '${arg}'`);
-				process.exit(1);
-			}
+			console.error(`Error: Invalid option '${arg}'`);
+			displayHelp();
+			process.exit(1);
 			break;
 	}
 });
 
-// Ensure either -add, -a, -remove, or -r is present
+// Ensure either -a, -add, -r, or -rremove is present
 if (!addOption && !removeOption) {
 	console.error("Error: One or more command line options must be specified.");
 	console.log("Here is the -help output to provide guidance.");
@@ -79,12 +77,12 @@ if (!addOption && !removeOption) {
 	process.exit(1);
 }
 
-// Function to generate MD5 hash of a string
+// Generate MD5 hash of a string (the filename)
 function generateMD5Hash(str) {
 	return crypto.createHash("md5").update(str).digest("hex");
 }
 
-// Function to process a single file
+// Process a single file
 function processFile(filename) {
 	const filePath = path.join(currentDirectory, filename);
 	const fileContent = fs.readFileSync(filePath, "utf-8");
