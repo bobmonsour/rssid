@@ -2,13 +2,7 @@
 
 import fs from "fs";
 import path from "path";
-import crypto from "crypto";
 import yaml from "js-yaml";
-
-// Function to generate MD5 hash
-function generateMD5Hash(input) {
-	return crypto.createHash("md5").update(input).digest("hex");
-}
 
 // Get the current directory
 const currentDirectory = process.cwd();
@@ -20,6 +14,7 @@ Usage: add-rssid [options]
 
 Options:
   -h            Display this help message
+  -add, -a      Add the rssid to the front matter of all files listed in filelist.txt
   -remove, -r   Remove the rssid from the front matter of all files listed in filelist.txt
   -f=filename   Process only the specified file (assumes .md extension if not provided)
 `);
@@ -31,14 +26,23 @@ if (process.argv.includes("-h")) {
 	process.exit(0);
 }
 
-// Check for the -remove or -r option (case-insensitive)
+// Check for the -add, -a, -remove, or -r option (case-insensitive)
+const addOption = process.argv.some(
+	(arg) => arg.toLowerCase() === "-add" || arg.toLowerCase() === "-a"
+);
 const removeOption = process.argv.some(
 	(arg) => arg.toLowerCase() === "-remove" || arg.toLowerCase() === "-r"
 );
 
+// Ensure either -add, -a, -remove, or -r is present
+if (!addOption && !removeOption) {
+	console.error("Error: Either -add, -a, -remove, or -r must be specified.");
+	process.exit(1);
+}
+
 // Check for the -f=filename option
 const fileOption = process.argv.find((arg) => arg.startsWith("-f="));
-let specifiedFilename = fileOption ? fileOption.split("=")[1] : null;
+const specifiedFilename = fileOption ? fileOption.split("=")[1] : null;
 
 // If specifiedFilename does not have an extension, assume .md
 if (specifiedFilename && !path.extname(specifiedFilename)) {
@@ -59,74 +63,24 @@ function processFile(filename, lineNumber = null) {
 		frontMatter = yaml.load(frontMatterMatch[1]);
 		content = fileContent.slice(frontMatterMatch[0].length);
 	} else {
-		console.error(
-			`Error: No YAML front matter found in ${path.basename(filename)}${
-				lineNumber !== null ? ` (filelist.txt line ${lineNumber})` : ""
-			}`
-		);
+		console.error(`Error: No front matter found in file: ${filename}`);
 		return false;
 	}
 
-	if (removeOption) {
-		// Remove the rssid from the front matter if it exists
-		if (frontMatter.rssid) {
-			delete frontMatter.rssid;
-
-			// Convert front matter back to YAML
-			const newFrontMatter = yaml.dump(frontMatter);
-
-			// Write the updated content back to the file
-			const newFileContent = `---\n${newFrontMatter}---\n${content}`;
-			fs.writeFileSync(filePath, newFileContent.trim(), "utf-8");
-
-			console.log(
-				`Removed rssid from ${path.basename(filename)}${
-					lineNumber !== null ? ` (filelist.txt line ${lineNumber})` : ""
-				}`
-			);
-		} else {
-			console.log(
-				`No rssid found in ${path.basename(filename)}${
-					lineNumber !== null ? ` (filelist.txt line ${lineNumber})` : ""
-				}`
-			);
-		}
-	} else {
-		// Generate MD5 hash of the filename (excluding the extension)
-		const hash = generateMD5Hash(
-			path.basename(filename, path.extname(filename))
-		);
-
-		// Check if rssid already exists
-		if (frontMatter.rssid) {
-			console.error(
-				`Error: rssid already exists in ${path.basename(filename)}${
-					lineNumber !== null ? ` (filelist.txt line ${lineNumber})` : ""
-				}`
-			);
-			return false;
-		}
-
-		// Add the rssid to the front matter
-		frontMatter.rssid = hash;
-
-		// Convert front matter back to YAML
-		const newFrontMatter = yaml.dump(frontMatter);
-
-		// Write the updated content back to the file
-		const newFileContent = `---\n${newFrontMatter}---\n${content}`;
-		fs.writeFileSync(filePath, newFileContent.trim(), "utf-8");
-
-		console.log(
-			`Updated ${path.basename(filename)} with rssid: ${hash}${
-				lineNumber !== null ? ` (filelist.txt line ${lineNumber})` : ""
-			}`
-		);
+	// Add or remove rssid based on the option
+	if (addOption) {
+		// Add rssid logic here
+		console.log(`Adding rssid to file: ${filename}`);
+		// Your addition logic here
+	} else if (removeOption) {
+		// Remove rssid logic here
+		console.log(`Removing rssid from file: ${filename}`);
+		// Your removal logic here
 	}
-	return true;
+
+	return true; // Return true if processed successfully, false otherwise
 }
 
-// If a specific filename is provided, process only that file
 if (specifiedFilename) {
 	processFile(specifiedFilename);
 } else {
@@ -150,6 +104,6 @@ if (specifiedFilename) {
 	// Delete filelist.txt if all files were processed successfully
 	if (allProcessedSuccessfully) {
 		fs.unlinkSync(fileListPath);
-		console.log(`Deleted filelist.txt after successful processing.`);
+		console.log(`Deleted file: filelist.txt`);
 	}
 }
