@@ -1,4 +1,4 @@
-# rssid: generating permanent and unique RSS feed IDs
+# rssid: generating permanent and unique RSS entry IDs
 
 ## Why?
 
