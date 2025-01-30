@@ -36,7 +36,8 @@ To add an rssid element to the YAML in all of your markdown files in the current
 
 If you want to see all the available options, run the command: `rssid -h`. You'll get the following output:
 
-`Usage: rssid [options]
+```bash
+Usage: rssid [options]
 
 Options:
 -h, -help Display this help message
@@ -52,6 +53,7 @@ This command operates ONLY on files in the current directory. It adds
 or removes a YAML front matter item named "rssid" that is the md5 hash
 of the filename (excluding the extension) for the file(s) processed.
 If the file(s) contain no YAML front matter, an error is noted, yet
-other files will still be processed as needed.`
+other files will still be processed as needed.
+```
 
 That's about it. If you have questions, you can find my email address in the package.json file.
