@@ -51,7 +51,7 @@ the -e=<ext> or the -f=<filename> option, all .md files will be processed.
 
 This command operates ONLY on files in the current directory. It adds
 or removes a YAML front matter item named "rssid" that is the md5 hash
-of the filename (excluding the extension) for the file(s) processed.
+of the full filename (including the extension) for the file(s) processed.
 If the file(s) contain no YAML front matter, an error is noted, yet
 other files will still be processed as needed.
 ```
@@ -69,5 +69,9 @@ Here's what I do in my own feed template:
 `<id>tag:bobmonsour.com,{{ post.date | toDateString }}:{{ post.data.rssid }}</id>`
 
 Note that 11ty converts the yyyy-mm-dd to a javascript date, so I created a filter to retain the YAML date that I originally entered in the post.
+
+Once you do that, your RSS feed will have a permanent and unique ID for each entry. Here's an example from one of my posts:
+
+`<id>tag:bobmonsour.com,2025-01-27:fbd41eaa4a5f32d6844c4acf4346b82e</id>`
 
 That's about it. If you have questions, you can find my email address in the package.json file.
