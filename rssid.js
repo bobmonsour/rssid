@@ -25,7 +25,7 @@ the -e=<ext> or the -f=<filename> option, all .md files will be processed.
 
 This command operates ONLY on files in the current directory. It adds
 or removes a YAML front matter item named "rssid" that is the md5 hash
-of the filename (excluding the extension) for the file(s) processed.
+of the full filename (including the extension) for the file(s) processed.
 If the file(s) contain no YAML front matter, an error is noted, yet
 other files will still be processed as needed.`);
 }
