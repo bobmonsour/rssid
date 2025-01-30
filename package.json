@@ -1,5 +1,5 @@
 {
-	"name": "tools",
+	"name": "rssid",
 	"version": "1.0.0",
 	"main": "rssid.js",
 	"type": "module",
@@ -7,11 +7,14 @@
 		"test": "echo \"Error: no test specified\" && exit 1"
 	},
 	"keywords": [],
-	"author": "",
+	"author": {
+		"name": "Bob Monsour",
+		"email": "bob.monsour@gmail.com",
+		"url": "https://bobmonsour.com"
+	},
 	"license": "ISC",
 	"description": "",
 	"dependencies": {
-		"crypto": "^1.0.1",
 		"fs": "^0.0.1-security",
 		"js-yaml": "^4.1.0",
 		"path": "^0.12.7"

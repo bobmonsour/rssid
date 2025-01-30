@@ -102,9 +102,8 @@ function processFile(filename) {
 
 	// Add or remove rssid based on the option
 	if (addOption) {
-		// Generate MD5 hash of the base part of the filename (excluding the extension)
-		const baseName = path.basename(filename, path.extname(filename));
-		const rssid = generateMD5Hash(baseName);
+		// Generate an MD5 hash of the filename, including the extension
+		const rssid = generateMD5Hash(filename);
 		console.log(`Adding rssid to file: ${filename}`);
 		frontMatter.rssid = rssid;
 	} else if (removeOption) {
