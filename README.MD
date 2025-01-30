@@ -56,4 +56,18 @@ If the file(s) contain no YAML front matter, an error is noted, yet
 other files will still be processed as needed.
 ```
 
+Once you have created a unique rssid element in your YAML, you'll need to update your feed template(s) to use it. As Evan noted in [his post](https://darthmall.net/2025/on-the-importance-of-stable-ids/), and as I did [in mine](https://bobmonsour.com/blog/creating-permanently-unique-entry-id-for-rss/), a solid approach is to use the [tag URI scheme](https://en.wikipedia.org/wiki/Tag_URI_scheme). The general format of such URIs is:
+
+`"tag:" authorityName "," YYYY-MM-DD-date ":" specific [ "#" fragment ]`
+
+For example, the `<id>` line in the sample feed templates look like this:
+
+`<id>{{ absolutePostUrl }}</id>`
+
+Here's what I do in my own feed template:
+
+`<id>tag:bobmonsour.com,{{ post.date | toDateString }}:{{ post.data.rssid }}</id>`
+
+Note that 11ty converts the yyyy-mm-dd to a javascript date, so I created a filter to retain the YAML date that I originally entered in the post.
+
 That's about it. If you have questions, you can find my email address in the package.json file.
