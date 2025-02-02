@@ -1,5 +1,17 @@
 # rssid: generating permanent and unique RSS entry IDs
 
+## February 2, 2025 - An update that fully automates this process
+
+Here are all the writings from my site about the problem and my journey to solve it:
+
+- [On RSS entry IDs](/til/on-rss-entry-ids/), _Jan 25, 2025_
+- [Much more to come on RSS entry IDs](/til/much-more-to-come-on-rss-entry-ids/), _Jan 26, 2025_
+- [Creating quasi-permanently unique entry IDs for RSS](/blog/creating-permanently-unique-entry-id-for-rss/), _Jan 27, 2025_
+- [My last word on RSS entry IDs](/blog/even-more-on-rss-ids/), _Jan 30, 2025_
+- [Prepare for a minor flood of RSS entries](/til/prepare-for-a-minor-flood-of-rss-entries/), _Jan 31, 2025_
+- [I wanted to validate the presence of an rssid in my front matter](/til/i-wanted-to-validate-the-presence-of-an-rssid-in-my-front-matter/), _Feb 1, 2025_
+- [Ok, this is my 'final' final word on RSS entry IDs](/blog/final-final-word-on-rss-entry-ids/), _Feb 2, 2025_
+
 ## Why?
 
 What was sparked by [a blog post](https://darthmall.net/2025/on-the-importance-of-stable-ids/) and [my blog post responding to it](https://bobmonsour.com/blog/creating-permanently-unique-entry-id-for-rss/) has now turned into this tool called 'rssid.' So, what problem does it solve?
