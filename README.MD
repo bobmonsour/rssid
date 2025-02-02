@@ -12,6 +12,8 @@ Here are all the writings from my site about the problem and my journey to solve
 - [I wanted to validate the presence of an rssid in my front matter](/til/i-wanted-to-validate-the-presence-of-an-rssid-in-my-front-matter/), _Feb 1, 2025_
 - [Ok, this is my 'final' final word on RSS entry IDs](/blog/final-final-word-on-rss-entry-ids/), _Feb 2, 2025_
 
+That last entry shows the fully automated version of the solution.
+
 ## Why?
 
 What was sparked by [a blog post](https://darthmall.net/2025/on-the-importance-of-stable-ids/) and [my blog post responding to it](https://bobmonsour.com/blog/creating-permanently-unique-entry-id-for-rss/) has now turned into this tool called 'rssid.' So, what problem does it solve?
